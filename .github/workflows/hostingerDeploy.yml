@@ -82,21 +82,38 @@ jobs:
           port: 22
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            cd /home/user/htdocs/scrumprojectmanager.online
+            # First ensure we're in the correct directory
+            cd /home/user/htdocs/srv593571.hstgr.cloud || exit 1
+            
+            # Check if directory exists and is a git repository
+            if [ ! -d ".git" ]; then
+              echo "Initializing git repository..."
+              git init
+              git remote add origin ${{ github.server_url }}/${{ github.repository }}.git
+            fi
+            
             git fetch --all
             if [ "${{ github.event_name }}" = "release" ]; then
               git checkout ${{ github.event.release.tag_name }}
             else
               git pull origin main
             fi
+            
+            # Load NVM
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            
+            # Install dependencies and build
             composer install --no-dev --optimize-autoloader
             npm ci
             npm run build
+            
+            # Laravel commands
             php artisan migrate --force
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
             php artisan storage:link
+            
+            # Set permissions
             chmod -R 777 storage bootstrap/cache
