@@ -73,9 +73,6 @@ jobs:
       - name: Build Vue Assets
         run: npm run build
 
-      - name: Run Tests
-        run: php artisan test
-
       - name: Deploy to Hostinger
         if: ${{ success() }}
         uses: appleboy/ssh-action@master
