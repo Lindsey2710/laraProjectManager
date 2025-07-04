@@ -31,9 +31,13 @@ export default function Show({ auth, success, project, tasks, queryParams }) {
           <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
             <div>
               <img
-                src={project.image_path}
-                alt=""
+                src={project.image_path || '/img/default.jpg'}
+                alt={`${project.name} project image`}
                 className="w-full h-64 object-cover"
+                onError={(e) => {
+                  e.target.src = '/img/default.jpg';
+                  e.target.onerror = null; // Prevent infinite loop
+                }}
               />
             </div>
             <div className="p-6 text-gray-900 dark:text-gray-100">

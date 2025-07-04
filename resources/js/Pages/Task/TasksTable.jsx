@@ -150,7 +150,15 @@ export default function TasksTable({ tasks, success, queryParams = null, hidePro
                       >
                         <td className="px-3 py-2">{task.id}</td>
                         <td className="px-3 py-2">
-                          <img src={task.image_path} style={{ width: 60 }} />
+                        <img
+                            src={task.image_path || '/img/defaulttask.jpg'}
+                            style={{ width: 60, height: 60, objectFit: 'cover' }}
+                            alt={`${task.name} task image`}
+                            onError={(e) => {
+                              e.target.src = '/img/defaulttask.jpg';
+                              e.target.onerror = null; // Prevent infinite loop
+                            }}
+                          />
                         </td>
                         {!hideProjectColumn && (<td className="px-3 py-2">{task.project.name}</td>)}
                         <th className="px-3 py-2 text-gray-100 hover:underline">

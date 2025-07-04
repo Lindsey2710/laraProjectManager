@@ -16,7 +16,7 @@ export default function AuthenticatedLayout({ user, header, children }) {
                         <div className="flex">
                             <div className="shrink-0 flex items-center">
                                 <Link href="/">
-                                    <img src="../img/tasksupervisor.png" className='block h-9 w-auto fill-current'/>
+                                    <img src="/img/tasksupervisor.png" className='block h-9 w-auto fill-current'/>
                                     {/* <ApplicationLogo className=" text-gray-800 dark:text-gray-200" /> */}
                                 </Link>
                             </div>
@@ -132,7 +132,18 @@ export default function AuthenticatedLayout({ user, header, children }) {
                 </header>
             )}
 
-            <main>{children}</main>
+            <main>
+            <div 
+            className="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0"
+            style={{
+                backgroundImage: 'url(/img/background.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+            }}
+        >
+                {children}</div>
+            </main>
         </div>
     );
 }

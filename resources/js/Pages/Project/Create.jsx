@@ -5,6 +5,7 @@ import TextAreaInput from "@/Components/TextAreaInput";
 import TextInput from "@/Components/TextInput";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
+import { useState } from "react";
 
 export default function Create({ auth }) {
   const { data, setData, post, errors, reset } = useForm({
@@ -14,6 +15,23 @@ export default function Create({ auth }) {
     description: "",
     due_date: "",
   });
+
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setData("image", file);
+    
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImagePreview(null);
+    }
+  };
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -37,19 +55,31 @@ export default function Create({ auth }) {
       <div className="py-12">
         <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
           <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-              <form
-                onSubmit={onSubmit}
-                className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+                          <form
+              onSubmit={onSubmit}
+              encType="multipart/form-data"
+              className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                 <div>
                   <InputLabel htmlFor="project_image_path" value="Project Image" />
                   <TextInput
                   id="project_image_path"
                   type="file"
                   name="image"
+                  accept="image/*"
                   className="mt-1 block w-full"
-                  onChange={(e) => setData("image", e.target.files[0])}
+                  onChange={handleImageChange}
                   />
                   <InputError message={errors.image} className="mt-2" />
+                  
+                  {imagePreview && (
+                    <div className="mt-4">
+                      <img 
+                        src={imagePreview} 
+                        alt="Preview" 
+                        className="w-64 h-48 object-cover rounded"
+                      />
+                    </div>
+                  )}
                 </div>
                 <div className="mt-4">
                   <InputLabel htmlFor="project_name" value="Project Name" />

@@ -28,9 +28,13 @@ export default function Show({ auth, task }) {
           <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
           <div>
                 <img
-                src={task.image_path}
-                alt=""
+                src={task.image_path || '/img/defaulttask.jpg'}
+                alt={`${task.name} task image`}
                 className="w-full h-64 object-cover"
+                onError={(e) => {
+                  e.target.src = '/img/defaulttask.jpg';
+                  e.target.onerror = null; // Prevent infinite loop
+                }}
                  />
               </div>
             <div className="p-6 text-gray-900 dark:text-gray-100">

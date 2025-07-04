@@ -5,6 +5,7 @@ import TextAreaInput from "@/Components/TextAreaInput";
 import TextInput from "@/Components/TextInput";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
+import { useState } from "react";
 
 export default function Create({ auth, task, projects, users }) {
   const { data, setData, post, errors, reset } = useForm({
@@ -18,6 +19,23 @@ export default function Create({ auth, task, projects, users }) {
     assigned_user_id: task.assigned_user_id || "",
     _method: "PUT",
   });
+
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setData("image", file);
+    
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImagePreview(null);
+    }
+  };
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -43,6 +61,7 @@ export default function Create({ auth, task, projects, users }) {
           <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
             <form
               onSubmit={onSubmit}
+              encType="multipart/form-data"
               className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg"
             >
               <InputLabel htmlFor="task_project_id" value="Project" />
@@ -60,21 +79,37 @@ export default function Create({ auth, task, projects, users }) {
                   </option>
                 ))}
               </SelectInput>
-              {task.image_path && (
-                <div className="mb-4">
-                  <img src={task.image_path} className="w-64" />
-                </div>
-              )}
+              <div className="mb-4">
+                <img 
+                  src={task.image_path || '/img/defaulttask.jpg'} 
+                  className="w-64" 
+                  alt={task.name || 'Task Image'}
+                  onError={(e) => {
+                    e.target.src = '/img/defaulttask.jpg';
+                  }}
+                />
+              </div>
               <div className="mt-4">
                 <InputLabel htmlFor="task_image_path" value="Task Image" />
                 <TextInput
                   id="task_image_path"
                   type="file"
                   name="image"
+                  accept="image/*"
                   className="mt-1 block w-full"
-                  onChange={(e) => setData("image", e.target.files[0])}
+                  onChange={handleImageChange}
                 />
                 <InputError message={errors.image} className="mt-2" />
+                
+                {imagePreview && (
+                  <div className="mt-4">
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      className="w-64 h-48 object-cover rounded"
+                    />
+                  </div>
+                )}
               </div>
               <div className="mt-4">
                 <InputLabel htmlFor="task_name" value="Task Name" />

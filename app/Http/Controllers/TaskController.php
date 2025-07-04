@@ -72,7 +72,9 @@ class TaskController extends Controller
         $data['created_by'] = Auth::id();
         $data['updated_by'] = Auth::id();
         if ($image) {
-            $data['image_path'] = $data['image']->store('task/' . Str::random(), 'public');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('img/tasks'), $filename);
+            $data['image_path'] = '/img/tasks/' . $filename;
         }
         Task::create($data);
 
@@ -115,10 +117,12 @@ class TaskController extends Controller
         $image = $data['image'] ?? null;
         $data['updated_by'] = Auth::id();
         if ($image) {
-            if ($task->image_path) {
-                Storage::disk('public')->deleteDirectory(dirname($task->image_path));
+            if ($task->image_path && file_exists(public_path($task->image_path))) {
+                unlink(public_path($task->image_path));
             }
-            $data['image_path'] = $image->store('task/' . Str::random(), 'public');
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('img/tasks'), $filename);
+            $data['image_path'] = '/img/tasks/' . $filename;
         }
         $task->update($data);
         return to_route('task.index')
@@ -132,8 +136,8 @@ class TaskController extends Controller
     {
         $name = $task->name;
         $task->delete();
-        if ($task->image_path) {
-            Storage::disk('public')->deleteDirectory(dirname($task->image_path));
+        if ($task->image_path && file_exists(public_path($task->image_path))) {
+            unlink(public_path($task->image_path));
         }
         return to_route('task.index')
             ->with('success', "Task \"$name\" deleted successfully");

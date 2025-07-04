@@ -168,9 +168,16 @@ export default function Index({ auth, projects, queryParams = null, success }) {
                       >
                         <td className="px-3 py-2">{project.id}</td>
                         <td className="px-3 py-2">
+                          {console.log('Project', project.id, 'image_path:', project.image_path)}
                           <img
-                            src={project.image_path}
-                            style={{ width: 60, height: 60 }}
+                            src={project.image_path || '/img/default.jpg'}
+                            style={{ width: 60, height: 60, objectFit: 'cover' }}
+                            alt={`${project.name} project image`}
+                            onError={(e) => {
+                              console.log('Image failed to load:', e.target.src);
+                              e.target.src = '/img/default.jpg';
+                              e.target.onerror = null; // Prevent infinite loop
+                            }}
                           />
                         </td>
                         <th className="px-3 py-2 hover:underline text-gray-100 text-nowrap">
